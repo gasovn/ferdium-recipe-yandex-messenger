@@ -84,7 +84,12 @@ if (location.search.includes('build=passport-done')) {
           const options = {
             body: (preview && preview.textContent.trim()) || 'Новое сообщение',
           };
-          if (avatar && /^https?:/.test(avatar.src)) {
+          // Ferdium fetches the icon without the messenger session, so only the
+          // public avatars.mds.yandex.net CDN loads (files.messenger avatars 401).
+          if (
+            avatar &&
+            avatar.src.startsWith('https://avatars.mds.yandex.net/')
+          ) {
             options.icon = avatar.src;
           }
           const notification = new Notification(
