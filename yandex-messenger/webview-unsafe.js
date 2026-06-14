@@ -1,3 +1,10 @@
+// After Passport login the in-frame redirect lands on a build=passport-done
+// callback page that renders blank (it expects to be a popup). Reload the clean
+// URL so the authenticated app boots.
+if (location.search.includes('build=passport-done')) {
+  location.replace(location.origin + location.pathname);
+}
+
 // Yandex Passport login is a window.open() popup that Ferdium would send to the
 // system browser (no shared session). Keep it in-frame. The userActivation
 // guard skips Yandex's own automatic window.open calls, which would loop.
