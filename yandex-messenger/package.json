@@ -1,0 +1,10 @@
+{
+  "id": "yandex-messenger",
+  "name": "Yandex Messenger",
+  "version": "1.0.0",
+  "license": "MIT",
+  "config": {
+    "serviceURL": "https://yandex.ru/chat",
+    "hasCustomUrl": true
+  }
+}
