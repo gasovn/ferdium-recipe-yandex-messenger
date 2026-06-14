@@ -49,9 +49,14 @@ module.exports = Ferdium => {
       for (const { key, count, name, item } of chats) {
         if (count > (lastUnreads.get(key) || 0)) {
           const preview = item.querySelector('.ui-entity-block-multi-line');
-          new Notification(name.textContent.trim(), {
+          const avatar = item.querySelector('.ui-avatar__image');
+          const options = {
             body: (preview && preview.textContent.trim()) || 'Новое сообщение',
-          });
+          };
+          if (avatar && /^https?:/.test(avatar.src)) {
+            options.icon = avatar.src;
+          }
+          new Notification(name.textContent.trim(), options);
         }
       }
       if (otherSpace > lastOtherSpace) {
