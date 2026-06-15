@@ -37,6 +37,16 @@ module.exports = Ferdium => {
       } catch {
         return;
       }
+      // Attachment links (target="download") sit on a separate Yandex file
+      // host. Sending them out hands the download to a browser without the
+      // messenger session. Navigate in place instead: the attach=true response
+      // is served as an attachment, so Ferdium saves it and the page stays.
+      if (link.target === 'download') {
+        event.preventDefault();
+        event.stopPropagation();
+        window.location.assign(url);
+        return;
+      }
       if (parsed.host !== window.location.host) {
         event.preventDefault();
         event.stopPropagation();
