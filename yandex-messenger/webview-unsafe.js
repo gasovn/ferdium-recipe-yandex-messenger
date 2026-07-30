@@ -61,8 +61,21 @@ if (location.search.includes('build=passport-done')) {
       const count = badge
         ? toInt((badge.textContent.match(/\d+/) || [])[0])
         : 0;
-      unreads.set(key, count);
-      chats.push({ key, count, name, item });
+      // A muted chat renders its unread counter without the accent modifier
+      // (the badge component gets primary: !muted). While unreads exist this
+      // is the only mute marker in the DOM: the crossed-bell icon is shown
+      // only when the counter is empty, and data-test-tag attributes are
+      // stripped from the production build.
+      const counter = item.querySelector(
+        '.ui-badge:not(.ui-badge_has-mentions)',
+      );
+      const muted =
+        counter !== null && !counter.classList.contains('ui-badge_primary');
+      // The mention badge is icon-only (no digits) and stays accented even
+      // in a muted chat, so mentions can pierce mute.
+      const mention = item.querySelector('.ui-badge_has-mentions') !== null;
+      unreads.set(key, { count, mention });
+      chats.push({ key, count, muted, mention, name, item });
     }
 
     const spaceBadge = document.querySelector(
@@ -77,8 +90,10 @@ if (location.search.includes('build=passport-done')) {
       ![...unreads.keys()].some(key => lastUnreads.has(key));
 
     if (primed && !focused && !switched) {
-      for (const { key, count, name, item } of chats) {
-        if (count > (lastUnreads.get(key) || 0)) {
+      for (const { key, count, muted, mention, name, item } of chats) {
+        const prev = lastUnreads.get(key) || { count: 0, mention: false };
+        const newMention = mention && !prev.mention;
+        if ((!muted && count > prev.count) || newMention) {
           const preview = item.querySelector('.ui-entity-block-multi-line');
           const avatar = item.querySelector('.ui-avatar__image');
           const options = {
